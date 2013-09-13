@@ -1,2 +1,22 @@
+import sys,networking
+
+class Client():
+    connection = None
+    def __init__(self):
+        if(len(sys.argv) < 3):
+            print "Usage: client.py <remote ip> <port>"
+            quit()
+            
+        remote_ip = sys.argv[1]
+        port = sys.argv[2]
+        self.connection = networking.Connection(remote_ip,port)
+        self.connection.connect()
+
+    def main(self):
+        self.connection.send("Hello World!")
+        
+
 if __name__ == "__main__":
-    print "Client"
+    client = Client()
+    client.main()
+    
