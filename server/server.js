@@ -15,6 +15,19 @@ server.on("message",function(msg,rinfo)
 	{
 		console.log("Replied.");
 	});
+	
+	//Decode packet data
+	
+	//If `type`=`challenge`
+		//If qualifying game exists and has a free spot
+			//Generate session ID and send back game ID + session id
+		//Else
+			//Generate session ID and new game ID and send back to user
+	
+	//If `type`=`update`
+		//Verify game ID and session ID, or return
+		//Verify state changes, or return
+		//Apply state changes
 });
 
 server.on("listening",function()
@@ -24,3 +37,13 @@ server.on("listening",function()
 });
 
 server.bind(13370);
+
+//Start game tick
+	//Loop through games
+		//Update timers, AI, etc
+		//If tick%60
+			//Send entire gamestate to connected players
+		//Else
+			//Prepare all things that were updated to be sent (state changes)
+			//Encode state changes
+			//Send state changes to connected players
