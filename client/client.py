@@ -14,6 +14,9 @@ class Client():
 
     def main(self):
         self.connection.send("Hello World!")
+        while True:
+            data,addr = self.connection.receive()
+            print "Received %s from %s" % (data,addr)
         
 
 if __name__ == "__main__":
