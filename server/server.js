@@ -1,6 +1,6 @@
 var dgram=require("dgram");
 var uuid=require("uuid");
-var zlib=require("zlib");
+//var zlib=require("zlib");
 
 function clone(obj)
 {
@@ -13,7 +13,7 @@ function clone(obj)
 
 function step_game(game)
 {
-	//Step the game! AI! Etc!
+//Step the game! AI! Etc!
 }
 
 //Each Player
@@ -104,7 +104,8 @@ server.on("message",function(msg,rinfo)
 		return;
 	}
 	
-	msg=JSON.parse(msg);
+	try {msg=JSON.parse(msg);}
+	catch(e) {return;}
 	
 	//Is it a game challenge or a state update?
 	if(typeof msg.game_id===undefined)
