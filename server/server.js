@@ -96,16 +96,15 @@ server.on("message",function(msg,rinfo)
 	});
 */
 	
-	if(msg=="ping")
+	try {msg=JSON.parse(msg);}
+	catch(e) {return;}
+	
+	if(msg.type=="ping")
 	{
-		console.log("Ping request from: "+rinfo.address+":"+rinfo.port);
-		var dat=new Buffer("pong");
+		var dat=new Buffer(JSON.stringify({type:"pong"}));
 		server.send(dat,0,dat.length,rinfo.port,rinfo.address);
 		return;
 	}
-	
-	try {msg=JSON.parse(msg);}
-	catch(e) {return;}
 	
 	//Is it a game challenge or a state update?
 	if(typeof msg.game_id===undefined)
@@ -187,4 +186,4 @@ setInterval(function()
 			server.send(msg,0,msg.length,rinfo.port,rinfo.address);
 		}
 	}
-},1000/60);
+},1000/30);
