@@ -96,6 +96,14 @@ server.on("message",function(msg,rinfo)
 	});
 */
 	
+	if(msg=="ping")
+	{
+		console.log("Ping request from: "+rinfo.address+":"+rinfo.port);
+		var dat=new Buffer("pong");
+		server.send(dat,0,dat.length,rinfo.port,rinfo.address);
+		return;
+	}
+	
 	msg=JSON.parse(msg);
 	
 	//Is it a game challenge or a state update?
