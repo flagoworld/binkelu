@@ -1,3 +1,77 @@
+/*
+
+Client Commands
+–––––––––––––––––––––––––
+Challenge,
+Start a game or resume a game in progress
+{
+	"type":"challenge",
+	"user_id":"12345"
+}
+
+Update,
+Notify the server that the player is doing something
+The idea is that the client continues to send state values that don't match the server's state
+The client will stop sending a state value once it receives a state value from the server that conflicts with the change it
+For instance, if the user tries to put a card on the ground, the client keeps sending the information that the card is there
+Once the server actually receives the message, it determines that the user is trying to play a card and takes it from their inventory
+Once the card is actually played, the state updates sent to the user will include it since it is visible
+At this time, the client will see the conflicting message and cease to send the state update
+
+If the opponent has not been active for 15 seconds, the client has the option of accepting the win within the next 45 seconds
+If the client does not accept the win, they get it anyways
+During this time, they may validly include the "winner" state
+{
+	"type":"update",
+	"session_id":"12345",
+	"state":
+	{
+		"moving":"x,y",
+		"cards":
+		[
+			{
+				"id":"12345",
+				"position":"x,y"
+			}
+		],
+		"win":"1"
+	}
+	"moving":"x,y",
+}
+–––––––––––––––––––––––––
+
+Server Responses
+–––––––––––––––––––––––––
+
+State,
+The server sends the current game state to all clients in a game
+The current game state contains the positions of all objects visible to the client
+If the server state doesn't contain an object, it is assumed by the client to no-longer exist?
+{
+	"winner":"1 or 2",
+	"begin":"0 or 1"
+	"players":
+	[
+		{
+			"id":"12345",
+			"position":"x,y",
+			"health":"100",
+			"etc":"etc"
+		}
+	],
+	"cards":
+	[
+		{
+			"id":"12345",
+			"position":"x,y"
+		}
+	]
+}
+
+–––––––––––––––––––––––––
+
+
+*/
 var dgram=require("dgram");
 var uuid=require("uuid");
 //var zlib=require("zlib");
@@ -76,6 +150,7 @@ var Game=function()
 
 //All the games
 var games=[];
+var players=[];
 
 //The server
 var server=dgram.createSocket("udp4");
