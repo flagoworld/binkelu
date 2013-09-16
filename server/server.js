@@ -1,5 +1,21 @@
 /*
 
+Let's try this again...
+
+Client gives every action an incrementing ID and pushes it into the action list
+Client sends array of actions to server, assigning the most recent action ID as the packet ID
+
+Server sends out the state + sequence id of the entire game state to every client, including the client squence id of the last packet received from the client
+Client receives state from server, updates local state, then removes all actions from action array whose ID <= client sequence ID passed in packet
+
+
+
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+Below is the old method I was thinking of. Disregard it as I will modify it to match the above.
+––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+
+
 Client Commands
 –––––––––––––––––––––––––
 Challenge,
@@ -69,7 +85,6 @@ If the server state doesn't contain an object, it is assumed by the client to no
 }
 
 –––––––––––––––––––––––––
-
 
 */
 var dgram=require("dgram");
