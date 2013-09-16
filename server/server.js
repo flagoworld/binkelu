@@ -1,12 +1,29 @@
 /*
 
-Let's try this again...
+Let's try this again... More like how Quake3 does it...
 
 Client gives every action an incrementing ID and pushes it into the action list
 Client sends array of actions to server, assigning the most recent action ID as the packet ID
 
 Server sends out the state + sequence id of the entire game state to every client, including the client squence id of the last packet received from the client
 Client receives state from server, updates local state, then removes all actions from action array whose ID <= client sequence ID passed in packet
+
+Client packet (delta encoded client commands):
+
+//	Packet ID    Command,etc    ,Params?         ,etc
+	12345    ,command,command,command p1 p2 p3,command
+
+Server packet (entire state):
+
+//	Packet ID Last Client Packet ID,Key-value pairs outlining the state
+	12345    ,12345                ,key,value,key,value,key,value
+
+
+
+
+
+
+
 
 
 
