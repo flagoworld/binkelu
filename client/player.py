@@ -15,7 +15,7 @@ class Player(cocos.cocosnode.CocosNode):
         self.moving = False
         self.speed = 0
         self.acceleration = 0.1
-        self.max_speed = 10
+        self.max_speed = 2
         self.target = pos
         print "Player init!"
     
@@ -51,3 +51,4 @@ class Player(cocos.cocosnode.CocosNode):
         self.sprite.position = self.pos
         self.sprite.rotation = self.direction
         self.sprite.visit()
+        self.resume()

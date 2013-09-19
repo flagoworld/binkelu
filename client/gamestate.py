@@ -1,11 +1,12 @@
 import cocos
 from cocos.director import director
 import game
+import pyglet
 
 class GameState():
     def __init__(self,dimensions):
-        director.init(width=dimensions[0],height=dimensions[1],caption="lol game")
-        director.show_FPS = True
+        director.init(width=dimensions[0],height=dimensions[1],caption="lol game",vsync=True)
+        #director.show_FPS = True
         self.status = "in_game"
         s_game = game.Game()
         
