@@ -1,13 +1,26 @@
-import player
+import cocos.layer.base_layers
+import cocos
+import time
+import objectlayer
 
-class Game():
-    game_id = -1
-    objs = list()
+class Game(cocos.scene.Scene):
     def __init__(self):
-        self.objs.append(player.Player(1,(50,300)))
-        self.objs.append(player.Player(2,(550,300)))
+        super(Game,self).__init__()
+        self.game_id = -1
+        self.objs = objectlayer.Objectlayer()
+        self.add(self.objs)
         print "Game init!"
+    
+    def add_object(self,object):
+        self.objs.add(object)
+        return True
         
-    def update(self):
-        for obj in objs:
-            obj.update()
+    #def update(self):
+    #   for obj in objs:
+    #   obj.update()
+    #def draw(self):
+    #    super(Game,self).draw()
+    #    #print "lol"
+    #    
+    #    time.sleep(1.0/30.0)
+        

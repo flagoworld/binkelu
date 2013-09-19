@@ -1,5 +1,6 @@
 import socket
 import json
+import threading
 
 class Connection():
     remote_ip = ""
@@ -17,6 +18,15 @@ class Connection():
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.setblocking(0)
         self.connected = True
+        self.handle()
+    def disconnect(self):
+        self.connected = False
+    def handle(self):
+        #do send
+        #do receive
+        if(self.connected == True):
+            threading.Timer(1.0,self.handle).start() # :/
+        
     def send(self,msg):
         #print "Sending '%s' to %s:%s" % (msg,self.remote_ip,self.port)
         try:

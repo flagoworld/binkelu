@@ -1,7 +1,9 @@
+import cocos.custom_clocks
 import sys
 import networking
-import game
 import time
+import gamestate
+from pyglet import clock
 
 class Client():
     connection = None
@@ -15,19 +17,15 @@ class Client():
         port = sys.argv[2]
         
         self.connection = networking.Connection(remote_ip,port)
-        self.connection.connect()
-        self.game = game.Game()
+        #self.connection.connect()
+        self.game = gamestate.GameState((640,480))
 
     def main(self):
-        ping_obj = {"type":"ping"}
-        self.connection.send(ping_obj)
-        #self.connection.send(self.game)
-        while True:
-            response = self.connection.receive()
-            if response:
-                print response
-            time.sleep(1) #just so the server doesnt get spammed for now
-        
+        self.game.run("game")
+        self.quit() #runs after the game ends
+    
+    def quit(self):
+        self.connection.disconnect()
     
 
 if __name__ == "__main__":
