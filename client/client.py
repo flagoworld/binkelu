@@ -15,7 +15,7 @@ class Client():
         remote_ip = sys.argv[1]
         port = sys.argv[2]
         
-        networking.connect(remote_ip,port,2,self.server_command)
+        networking.connect(remote_ip,port,2,self.server_state)
         
         self.game = gamestate.GameState((640,480))
 
@@ -26,8 +26,10 @@ class Client():
     def quit(self):
         networking.get().disconnect()
 
-    def server_command(self,data):
-        print "Recv: %s" % (data)
+    def server_state(self,data):
+        #print "Recv: %s" % (data)
+        self.game.scenes['game'].objs.player.update(data)
+
 
 
 if __name__ == "__main__":

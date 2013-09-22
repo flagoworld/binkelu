@@ -15,5 +15,6 @@ class Objectlayer(cocos.layer.base_layers.Layer):
             self.player.move_to((x,y))
 
     def on_key_press(self,key,modifiers):
+        pass
 #        if(pyglet.window.key.symbol_string(key) == 'p'):
-        networking.get().send('{"type":"ping"}')
+#        networking.send_packet({"type":"ping"})

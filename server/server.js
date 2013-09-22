@@ -184,6 +184,17 @@ var Game=function()
 var games=[];
 var players=[];
 
+//Test server
+var direction = 0;
+var pos = [0,0];
+var moving = false;
+var speed = 0;
+var acceleration = 0.1;
+var max_speed = 2;
+var target = pos;
+var tmprinfo = false;
+var cpid = -1;
+
 //The server
 var server=dgram.createSocket("udp4");
 
@@ -213,6 +224,32 @@ server.on("message",function(msg,rinfo)
 		return;
 	}
 	
+	if(msg.type=="update")
+	{
+		tmprinfo=rinfo;
+		
+		var keys=Object.keys(msg.packets);
+		keys.sort(function(a,b){return parseInt(a,10)-parseInt(b,10)});
+		var len=keys.length;
+		
+		for(var i=0;i<len;++i)
+		{
+			if(parseInt(keys[i],10)<=cpid) continue;
+			
+			var p=msg.packets[keys[i]];
+			
+			if('moving' in p)
+				moving=p.moving;
+			
+			if('target' in p)
+				target=p.target;
+		}
+		
+		if(parseInt(keys[len-1],10)>cpid) cpid=parseInt(keys[len-1],10);
+	}
+	
+	return;
+	
 	//Is it a game challenge or a state update?
 	if(typeof msg.game_id===undefined)
 	{
@@ -240,6 +277,7 @@ server.bind(13370);
 //Start game tick, 60/sec
 var tick_time=process.hrtime();
 
+/*
 setInterval(function()
 {
 	var game_count=games.length;
@@ -293,4 +331,50 @@ setInterval(function()
 			server.send(msg,0,msg.length,rinfo.port,rinfo.address);
 		}
 	}
+},1000/30);
+*/
+
+setInterval(function()
+{
+	if(moving)
+	{
+        px = pos[0];
+        py = pos[1];
+        tx = target[0];
+        ty = target[1];
+        direction = 90-(Math.atan2(ty-py,tx-px)*(180/Math.PI));
+        
+        if(speed < max_speed)
+            speed += acceleration;
+        
+        td = Math.sqrt(Math.pow(tx-px,2)+Math.pow(ty-py,2));
+        if(speed > td)
+            speed = td;
+        
+        dx = Math.sin((direction)*(Math.PI/180))*speed;
+        dy = Math.cos((direction)*(Math.PI/180))*speed;
+        
+        pos = [pos[0]+dx,pos[1]+dy];
+        
+        if (pos[0] == tx && pos[1] == ty)
+        {
+            moving = false;
+            speed = 0;
+        }
+    }
+    
+    if(tmprinfo)
+    {
+     	var d={};
+     	d.cpid=cpid;
+     	d.pos=pos;
+     	d.direction=direction;
+     	d.moving=moving;
+     	d.speed=speed;
+     	d.acceleration=acceleration;
+     	d.max_speed=max_speed;
+     	d.target=target;
+     	var msg=new Buffer(JSON.stringify(d));
+     	server.send(msg,0,msg.length,tmprinfo.port,tmprinfo.address);
+    }
 },1000/30);
