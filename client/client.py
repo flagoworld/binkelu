@@ -6,7 +6,6 @@ import gamestate
 from pyglet import clock
 
 class Client():
-    connection = None
     game = None
     def __init__(self):
         if(len(sys.argv) < 3):
@@ -16,8 +15,8 @@ class Client():
         remote_ip = sys.argv[1]
         port = sys.argv[2]
         
-        self.connection = networking.Connection(remote_ip,port)
-        #self.connection.connect()
+        networking.connect(remote_ip,port,2,self.server_command)
+        
         self.game = gamestate.GameState((640,480))
 
     def main(self):
@@ -25,8 +24,11 @@ class Client():
         self.quit() #runs after the game ends
     
     def quit(self):
-        self.connection.disconnect()
-    
+        networking.get().disconnect()
+
+    def server_command(self,data):
+        print "Recv: %s" % (data)
+
 
 if __name__ == "__main__":
     client = Client()
