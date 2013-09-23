@@ -334,36 +334,90 @@ setInterval(function()
 },1000/30);
 */
 
+//Custom timer for physics?
+
+function Timer(settings)
+{
+    this.settings = settings;
+    this.timer = null;
+ 
+    this.fps = settings.fps || 30;
+    this.interval = Math.floor(1000/this.fps);
+    this.timeInit = null;
+         
+    return this;
+}
+ 
+Timer.prototype = 
+{   
+    run: function()
+    {
+        var $this = this;
+         
+        this.settings.run();
+        this.timeInit += this.interval;
+ 
+        this.timer = setTimeout(
+            function(){$this.run()}, 
+            this.timeInit - (new Date).getTime()
+        );
+    },
+     
+    start: function()
+    {
+        if(this.timer == null)
+        {
+            this.timeInit = (new Date).getTime();
+            this.run();
+        }
+    },
+     
+    stop: function()
+    {
+        clearTimeout(this.timer);
+        this.timer = null;
+    }
+}
+
+//Step physics
+new Timer(
+{
+	fps:60,
+	run:function()
+	{
+		if(moving)
+		{
+	        px = pos[0];
+	        py = pos[1];
+	        tx = target[0];
+	        ty = target[1];
+	        direction = 90-(Math.atan2(ty-py,tx-px)*(180/Math.PI));
+	        
+	        if(speed < max_speed)
+	            speed += acceleration;
+	        
+	        td = Math.sqrt(Math.pow(tx-px,2)+Math.pow(ty-py,2));
+	        if(speed > td)
+	            speed = td;
+	        
+	        dx = Math.sin((direction)*(Math.PI/180))*speed;
+	        dy = Math.cos((direction)*(Math.PI/180))*speed;
+	        
+	        pos = [pos[0]+dx,pos[1]+dy];
+	        
+	        if (pos[0] == tx && pos[1] == ty)
+	        {
+	            moving = false;
+	            speed = 0;
+	        }
+	    }
+	}
+}).start();
+
+//Step gamestate
 setInterval(function()
 {
-	if(moving)
-	{
-        px = pos[0];
-        py = pos[1];
-        tx = target[0];
-        ty = target[1];
-        direction = 90-(Math.atan2(ty-py,tx-px)*(180/Math.PI));
-        
-        if(speed < max_speed)
-            speed += acceleration;
-        
-        td = Math.sqrt(Math.pow(tx-px,2)+Math.pow(ty-py,2));
-        if(speed > td)
-            speed = td;
-        
-        dx = Math.sin((direction)*(Math.PI/180))*speed;
-        dy = Math.cos((direction)*(Math.PI/180))*speed;
-        
-        pos = [pos[0]+dx,pos[1]+dy];
-        
-        if (pos[0] == tx && pos[1] == ty)
-        {
-            moving = false;
-            speed = 0;
-        }
-    }
-    
-    if(tmprinfo)
+	if(tmprinfo)
     {
      	var d={};
      	d.cpid=cpid;
@@ -377,4 +431,4 @@ setInterval(function()
      	var msg=new Buffer(JSON.stringify(d));
      	server.send(msg,0,msg.length,tmprinfo.port,tmprinfo.address);
     }
-},1000/30);
+},1000/10);

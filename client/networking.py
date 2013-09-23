@@ -22,6 +22,8 @@ def add_packet(msg):
     global __packets
     global __packet_id
     
+    __packet_id += 1
+    
     if not __packet_id in __packets:
         __packets[__packet_id] = {}
     
@@ -36,8 +38,6 @@ def send_packet():
     if not len(__packets):
         return
     
-    __packet_id += 1
-    
     packet = {}
     packet['type'] = 'update'
     packet['packets'] = __packets
@@ -45,8 +45,9 @@ def send_packet():
     data = json.dumps(packet,separators=(',',':'))
     __singleton.send(data)
 
-def receive_packet(data):
+def receive_packet(data,recv_callback):
     global __packets
+    global __packet_id
     global __singleton
     
     packets=copy.deepcopy(__packets);
@@ -54,6 +55,13 @@ def receive_packet(data):
     for key in packets:
         if int(key) <= int(data['cpid']):
             del __packets[key]
+
+    if int(data['cpid']) < __packet_id:
+        #print "Discard: %i < %i" % (data['cpid'],__packet_id)
+        return
+
+    if recv_callback is not None:
+        recv_callback(data)
 
 class Connection():
     remote_ip = ""
@@ -96,6 +104,4 @@ class Connection():
             if do_read:
                 data,addr = self.sock.recvfrom(1024)
                 data = json.loads(data)
-                receive_packet(data)
-                if self.recv_callback is not None:
-                    self.recv_callback(data)
+                receive_packet(data,self.recv_callback)

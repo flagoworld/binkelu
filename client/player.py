@@ -41,26 +41,26 @@ class Player(cocos.cocosnode.CocosNode):
         self.sprite.draw()
     
     def visit(self):
-#        if(self.moving == True): #handle movement
-#            px,py = self.pos
-#            tx,ty = self.target
-#            self.direction = 90-math.degrees(math.atan2(ty-py,tx-px))
-#            
-#            if(self.speed < self.max_speed):
-#                self.speed += self.acceleration
-#            
-#            td = math.sqrt((tx-px)**2+(ty-py)**2)
-#            if(self.speed > td):
-#                self.speed = td
-#            
-#            dx = math.sin(math.radians(self.direction))*self.speed
-#            dy = math.cos(math.radians(self.direction))*self.speed
-#            
-#            self.pos = (self.pos[0]+dx,self.pos[1]+dy)
-#            
-#            if (self.pos == (tx,ty)):
-#                self.moving = False
-#                self.speed = 0
+        if(self.moving == True): #handle movement
+            px,py = self.pos
+            tx,ty = self.target
+            self.direction = 90-math.degrees(math.atan2(ty-py,tx-px))
+            
+            if(self.speed < self.max_speed):
+                self.speed += self.acceleration
+            
+            td = math.sqrt((tx-px)**2+(ty-py)**2)
+            if(self.speed > td):
+                self.speed = td
+            
+            dx = math.sin(math.radians(self.direction))*self.speed
+            dy = math.cos(math.radians(self.direction))*self.speed
+            
+            self.pos = (self.pos[0]+dx,self.pos[1]+dy)
+            
+            if (self.pos == (tx,ty)):
+                self.moving = False
+                self.speed = 0
         
         #temporarily here. will be in a fixed timer later on.
         networking.send_packet()
