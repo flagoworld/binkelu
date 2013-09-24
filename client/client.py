@@ -26,9 +26,9 @@ class Client():
     def quit(self):
         networking.get().disconnect()
 
-    def server_state(self,data):
+    def server_state(self,data,tick):
         #print "Recv: %s" % (data)
-        self.game.scenes['game'].objs.player.update(data)
+        self.game.scenes['game'].objs.player.update(data,tick)
 
 
 

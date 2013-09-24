@@ -14,10 +14,11 @@ class Player(cocos.cocosnode.CocosNode):
         self.direction = 0
         self.pos = pos
         self.moving = False
-        self.speed = 0
-        self.acceleration = 0.1
-        self.max_speed = 2
+        self.speed = 2
         self.target = pos
+        
+        self.ticks = 0
+#        self.lerp_to = pos
         print "Player init!"
     
     def move_to(self,target):
@@ -28,44 +29,56 @@ class Player(cocos.cocosnode.CocosNode):
         d['target'] = self.target
         networking.add_packet(d)
     
-    def update(self,data):
-        self.max_speed = data['max_speed']
-        self.direction = data['direction']
-        self.pos = (data['pos'][0],data['pos'][1])
+    def update(self,data,tick):
         self.moving = data['moving']
-        self.speed = data['speed']
-        self.acceleration = data['acceleration']
         self.target = (data['target'][0],data['target'][1])
-    
+        
+        pos = data['pos']
+        
+        if(self.moving == True):
+            while tick < networking.getTicks():
+                pos = self.move(pos)
+                if(pos == self.target):
+                    self.moving = False
+                    break
+
+        #TODO: Lerp to new pos instead of snapping
+        self.pos = pos
+
     def draw(self):
         self.sprite.draw()
     
     def visit(self):
-        if(self.moving == True): #handle movement
-            px,py = self.pos
-            tx,ty = self.target
-            self.direction = 90-math.degrees(math.atan2(ty-py,tx-px))
-            
-            if(self.speed < self.max_speed):
-                self.speed += self.acceleration
-            
-            td = math.sqrt((tx-px)**2+(ty-py)**2)
-            if(self.speed > td):
-                self.speed = td
-            
-            dx = math.sin(math.radians(self.direction))*self.speed
-            dy = math.cos(math.radians(self.direction))*self.speed
-            
-            self.pos = (self.pos[0]+dx,self.pos[1]+dy)
-            
-            if (self.pos == (tx,ty)):
-                self.moving = False
-                self.speed = 0
+#        s_pos = self.lerp_to
+#        c_pos = self.pos
+#        dist = math.sqrt((s_pos[0]-c_pos[0])**2+(s_pos[1]-c_pos[1])**2)
+#        
+#        if dist > 1 and dist < 8:
+#            self.pos = (c_pos[0]+((c_pos[0]-s_pos[0])*0.5),c_pos[1]+((c_pos[1]-s_pos[1])*0.5))
+#        else:
+#            self.lerp_to = self.pos = s_pos
         
-        #temporarily here. will be in a fixed timer later on.
-        networking.send_packet()
+        if(self.moving == True):
+            self.direction = 90-math.degrees(math.atan2(self.target[1]-self.pos[1],self.target[0]-self.pos[0]))
+            self.pos = self.move(self.pos)
+            
+            if(self.pos == self.target):
+                self.moving = False
         
         self.sprite.position = self.pos
         self.sprite.rotation = self.direction
         self.sprite.visit()
         self.resume()
+
+    def move(self,start_pos):
+        #handle movement
+        px,py = start_pos
+        tx,ty = self.target
+        
+        td = math.sqrt((tx-px)**2+(ty-py)**2)
+        if(self.speed > td):
+            return self.target
+        else:
+            dx = math.sin(math.radians(self.direction))*self.speed
+            dy = math.cos(math.radians(self.direction))*self.speed
+            return (start_pos[0]+dx,start_pos[1]+dy)

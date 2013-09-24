@@ -18,3 +18,9 @@ class Objectlayer(cocos.layer.base_layers.Layer):
         pass
 #        if(pyglet.window.key.symbol_string(key) == 'p'):
 #        networking.send_packet({"type":"ping"})
+
+    def draw(self):
+        networking.tick()
+
+        #TODO: temporarily here. will be in a fixed timer later on.
+        networking.send_packet()

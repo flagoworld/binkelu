@@ -391,25 +391,20 @@ new Timer(
 	        py = pos[1];
 	        tx = target[0];
 	        ty = target[1];
-	        direction = 90-(Math.atan2(ty-py,tx-px)*(180/Math.PI));
-	        
-	        if(speed < max_speed)
-	            speed += acceleration;
 	        
 	        td = Math.sqrt(Math.pow(tx-px,2)+Math.pow(ty-py,2));
+	        
 	        if(speed > td)
-	            speed = td;
-	        
-	        dx = Math.sin((direction)*(Math.PI/180))*speed;
-	        dy = Math.cos((direction)*(Math.PI/180))*speed;
-	        
-	        pos = [pos[0]+dx,pos[1]+dy];
-	        
-	        if (pos[0] == tx && pos[1] == ty)
 	        {
-	            moving = false;
-	            speed = 0;
-	        }
+		        dx = Math.sin((direction)*(Math.PI/180))*speed;
+		        dy = Math.cos((direction)*(Math.PI/180))*speed;
+		        
+		        pos = [pos[0]+dx,pos[1]+dy];
+		    }else
+		    {
+			    pos=target;
+			    moving=false;
+		    } 
 	    }
 	}
 }).start();
@@ -422,11 +417,7 @@ setInterval(function()
      	var d={};
      	d.cpid=cpid;
      	d.pos=pos;
-     	d.direction=direction;
      	d.moving=moving;
-     	d.speed=speed;
-     	d.acceleration=acceleration;
-     	d.max_speed=max_speed;
      	d.target=target;
      	var msg=new Buffer(JSON.stringify(d));
      	server.send(msg,0,msg.length,tmprinfo.port,tmprinfo.address);

@@ -5,6 +5,15 @@ import select
 import copy
 
 __singleton = None
+__tick = 0
+
+def getTick():
+    global __tick
+    return __tick
+
+def tick():
+    global __tick
+    __tick += 1
 
 def connect(ip,port,timeout=10,callback=None):
     global __singleton
@@ -21,14 +30,18 @@ __packet_id = 0
 def add_packet(msg):
     global __packets
     global __packet_id
+    global __tick
     
     __packet_id += 1
     
     if not __packet_id in __packets:
         __packets[__packet_id] = {}
+        __packets[__packet_id]['payload'] = {}
+    
+    __packets[__packet_id]['tick'] = __tick
     
     for key in msg:
-        __packets[__packet_id][key] = msg[key]
+        __packets[__packet_id]['payload'][key] = msg[key]
 
 def send_packet():
     global __packets
@@ -40,8 +53,11 @@ def send_packet():
     
     packet = {}
     packet['type'] = 'update'
-    packet['packets'] = __packets
-    
+    packet['packets'] = {}
+
+    for p in __packets:
+        packet['packets'][p] = __packets[p]['payload']
+
     data = json.dumps(packet,separators=(',',':'))
     __singleton.send(data)
 
@@ -52,6 +68,8 @@ def receive_packet(data,recv_callback):
     
     packets=copy.deepcopy(__packets);
     
+    tick = __packets[data['cpid']]['tick']
+    
     for key in packets:
         if int(key) <= int(data['cpid']):
             del __packets[key]
@@ -61,7 +79,7 @@ def receive_packet(data,recv_callback):
         return
 
     if recv_callback is not None:
-        recv_callback(data)
+        recv_callback(data,tick)
 
 class Connection():
     remote_ip = ""
